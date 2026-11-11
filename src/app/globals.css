@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0a0f;
+  --bg2: #14121b;
+  --ink: #f4eddd;
+  --muted: #a9a195;
+  --line: rgb(244 237 221 / 0.1);
+  --card: rgb(244 237 221 / 0.035);
+  --al: 0.82;
+  --ac: 0.13;
+  --h: 78;
+  --accent: oklch(var(--al) var(--ac) var(--h));
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f6f0e2;
+  --bg2: #ece3cf;
+  --ink: #1d1912;
+  --muted: #6a6254;
+  --line: rgb(29 25 18 / 0.13);
+  --card: rgb(255 255 255 / 0.5);
+  --al: 0.5;
+  --ac: 0.14;
+  color-scheme: light;
+}
+
+/* Any element that sets --h re-derives its own accent colour. */
+.hue {
+  --accent: oklch(var(--al) var(--ac) var(--h));
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --font-sans: "Heebo Variable", system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre Variable", "Times New Roman", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern";
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--accent) 45%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Film grain + ambient glow behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 85% -10%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(50rem 36rem at 0% 30%, oklch(var(--al) var(--ac) 292 / 0.07), transparent 70%),
+    radial-gradient(50rem 40rem at 100% 90%, oklch(var(--al) var(--ac) 205 / 0.06), transparent 70%);
+}
+
+.term {
+  font-family: var(--font-display);
+  font-style: italic;
+  letter-spacing: 0.01em;
+  unicode-bidi: isolate;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.gilded {
+  background: linear-gradient(100deg, var(--accent), oklch(var(--al) var(--ac) 32), var(--accent));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 9s linear infinite;
+}
+
+/* Cards that light up under the pointer (see PointerGlow) */
+.spot {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 1.5rem;
+  transition:
+    border-color 0.3s,
+    transform 0.3s;
+}
+.spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s;
+  background: radial-gradient(
+    22rem circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in oklch, var(--accent) 20%, transparent),
+    transparent 65%
+  );
+}
+.spot:hover::before,
+.spot:focus-visible::before {
+  opacity: 1;
+}
+a.spot:hover {
+  border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+  transform: translateY(-3px);
+}
+
+.glass {
+  background: color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid var(--line);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    transform 0.25s;
+}
+.btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Theme toggle icon swap, driven purely by the html attribute */
+.icon-sun {
+  display: none;
+}
+:root[data-theme="light"] .icon-sun {
+  display: block;
+}
+:root[data-theme="light"] .icon-moon {
+  display: none;
+}
+
+@keyframes sheen {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.98);
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.spin-slow {
+  animation: spin-slow 140s linear infinite;
+  transform-origin: center;
+}
+
+/* Scroll-driven motion: no JS, and static where unsupported */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    .scroll-progress {
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+@supports not (animation-timeline: view()) {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
